@@ -6,18 +6,18 @@ a.removeEventListener("load",S),r.ready()}"complete"===d.readyState||"loading"!=
 /////////////////////////
 
 
-var x = document.getElementById('tweet-box-home-timeline');
+
 
 var start = '{\"text\": \" '
 var end = ' \"}'
-var message = 'what a time to be alive sad sorrow';
+var message = 'testing this text';
 var data = '';
-var ratingt = '';
+var rating = '';
 
 //Gets stuff in message box
-x.innerText;
 
-message = x;
+  // message = x;
+
 
 // Get the main tweet button  (there are more than one, but the main one is the first).
 var y = document.getElementsByClassName("btn primary-btn tweet-action tweet-btn js-tweet-btn");
@@ -26,45 +26,58 @@ var y = document.getElementsByClassName("btn primary-btn tweet-action tweet-btn 
 
 y[0].addEventListener("click", function(event){tweetParser(event)}, true);
 
+
 function tweetParser(event){
-    console.log('test!');
+    // console.log('test!');
+    var x = document.getElementById('tweet-box-home-timeline');
+    message = x.innerText;
+
 
     event.stopPropagation(); // stops the twitter sending the tweet
 
     // var isMean = true;
 
+    var baseurl = "https://watson-api-explorer.mybluemix.net/tone-analyzer/api/v3/tone?version=2016-05-19&text=";
+    var sufix = message.replace(/ /g,"\%20");
+
     function yourFunction(callback){
       $.ajax({
-          url: "https://watson-api-explorer.mybluemix.net/tone-analyzer/api/v3/tone?version=2016-05-19&text=",
-          type: 'POST',
+          url: baseurl + sufix,
+          type: 'GET',
           dataType: 'json',
           contentType: 'application/json',
           processData: false,
           data: "" + start + message + end,
           success: function (data) {
+            alert(data);
           alert(JSON.stringify(data));
           //data = JSON.stringify(data.document_tone.tone_categories[0].tones[0].tone_id);
           },
           error: function(){
-              alert("Cannot get data");
+              alert("Cannot get data"+ start + message + end);
           }
 
           }).done(function(result) {
               /* do something with the result here */
-              alert("asdfdafasdf" + x);
+              // alert("asdfdafasdf" + x);
               rating = JSON.stringify(result);
-              document.write(rating);
+              // document.write(rating);
               callback(result); // invokes the callback function passed as parameter
-
         });
     }
 
     yourFunction(function(result) {
-        rating = (JSON.stringify(result.document_tone.tone_categories[0].tones[0].score));
 
-        // if(rating < 0.05){
-        alert("That is offensive");
-        // }
+        // alert(result);
+
+        rating = JSON.stringify(result.document_tone.tone_categories[0].tones[0].score);
+
+        // alert(rating);
+
+        if(rating > 0.4){
+          isMean = true;
+          // alert("That is offensive");
+        }
 
     });
 
@@ -78,3 +91,4 @@ function tweetParser(event){
 
     };
 }
+
