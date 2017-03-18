@@ -7,15 +7,16 @@
   [
     {
       "matches": ["*://*/*"],
-      "js": ["twitterthing.js"],
+      "js": ["jquery-3.2.0.min.js", "twitterthing.js"],
       "run_at": "document_end"
     }
   ],
-  //"background":{
-  //    "scripts":["background.js"]
-  //},
+  "background":{
+    "scripts" : ["jquery-3.2.0.min.js"]
+  },
   "permissions":[
       "tabs",
       "http://www.twitter.com/*"
+
   ]
 }
