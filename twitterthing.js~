@@ -5,14 +5,14 @@ a.removeEventListener("load",S),r.ready()}"complete"===d.readyState||"loading"!=
 
 /////////////////////////
 
-var start = '{\"text\": \" ';
-var end = ' \"}';
-var message = 'what a time to be alive sad sorrow';
-var data = '';
-var anger = '';
-var disgust = '';
 
-const MEAN_THRESHOLD = 0.4;
+
+
+var start = '{\"text\": \" '
+var end = ' \"}'
+var message = 'testing this text';
+var data = '';
+var rating = '';
 
 var isMean;
 var length1 = 0;
@@ -23,6 +23,8 @@ var j;
 
 //Gets stuff in message box
 
+  // message = x;
+
 
 // Get the main tweet button  (there are more than one, but the main one is the first).
 var y = document.getElementsByClassName("btn primary-btn tweet-action tweet-btn js-tweet-btn");
@@ -31,16 +33,6 @@ var y = document.getElementsByClassName("btn primary-btn tweet-action tweet-btn 
 
 y[0].addEventListener("click", function(event){tweetParser(event)}, true);
 
-
-function sleep (time) {
-  return new Promise((resolve) => setTimeout(resolve, time));
-}
-
-
-//function tweetParser(event){
-//    console.log('test!');
-//    console.log(x.innerText);
-//    message = x.innerText;
 var disable = ["!", "@", "#", "$", "%", "^", "&", "*", "(" , ")" , "-" , "_", "/", "\\", ".", ">", "<"]; //16 elements
 
 function tweetParser(event){
@@ -69,9 +61,13 @@ function tweetParser(event){
     var suffix = words.join("%20"); // merges the array of strings into a single one and adds %20 between them
     console.log(suffix);
 
+
     event.stopPropagation(); // stops the twitter sending the tweet
 
+    // var isMean = true;
+
     var baseurl = "https://watson-api-explorer.mybluemix.net/tone-analyzer/api/v3/tone?version=2016-05-19&text=";
+    // var suffix = message.replace(/ /g,"\%20");
 
     function yourFunction(callback){
       $.ajax({
@@ -82,47 +78,46 @@ function tweetParser(event){
           processData: false,
           data: "" + start + message + end,
           success: function (data) {
-          console.log(JSON.stringify(data));
+            alert(data);
+          alert(JSON.stringify(data));
+          //data = JSON.stringify(data.document_tone.tone_categories[0].tones[0].tone_id);
           },
           error: function(){
-              console.log("Cannot get data");
+              alert("Cannot get data"+ start + message + end);
           }
 
           }).done(function(result) {
-              ///* do something with the result here */
-              //rating = JSON.stringify(result);
-              ////document.write(rating);
-              //callback(result); // invokes the callback function passed as parameter
-              console.log('ajax done');
-
-              anger = (JSON.stringify(result.document_tone.tone_categories[0].tones[0].score));
-              disgust = (JSON.stringify(result.document_tone.tone_categories[1].tones[0].score));
-              if(anger > MEAN_THRESHOLD || disgust > MEAN_THRESHOLD){
-                  event.stopPropagation();
-                  if( confirm("We have detected that this may be offensive to others. Do you want to revise your tweet?")){
-                      console.log('mans did the right thing');
-                      sleep(1000);
-                  } else{
-                      console.log('why man');
-                      y[0].click();
-                      // add a sleep so that the code is not executed twice
-                      sleep(1000);
-                  };
-                  
-              } else {
-                  console.log('nice tweet');
-                  y[0].click();
-                  // add a sleep so that the code is not executed twice
-                  sleep(1000);
-              };
+              /* do something with the result here */
+              // alert("asdfdafasdf" + x);
+              rating = JSON.stringify(result);
+              // document.write(rating);
+              callback(result); // invokes the callback function passed as parameter
         });
     }
 
     yourFunction(function(result) {
-        rating = (JSON.stringify(result.document_tone.tone_categories[0].tones[0].score));
 
-        event.stopPropagation(); // stops the twitter sending the tweet
+        // alert(result);
+
+        rating = JSON.stringify(result.document_tone.tone_categories[0].tones[0].score);
+
+        // alert(rating);
+
+        if(rating > 0.4){
+          isMean = true;
+          // alert("That is offensive");
+        }
 
     });
-};
+
+
+    // do stuff here, like API calls, etc...
+
+    if (isMean){
+        alert('kinda mean fam, sure you wanna tweet that?');
+        // if they want to change...
+        event.stopPropagation(); // stops the twitter sending the tweet
+
+    };
+}
 
