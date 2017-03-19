@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "anti-bully",
-  "version": "1.0",
+  "name": "anti-bully extension",
+  "version": "0.1",
   "description": "an extension to prevent online bullying",
   "content_scripts":
   [

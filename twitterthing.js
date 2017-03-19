@@ -8,16 +8,16 @@ a.removeEventListener("load",S),r.ready()}"complete"===d.readyState||"loading"!=
 
 var x = document.getElementById('tweet-box-home-timeline');
 
-var start = '{\"text\": \" '
-var end = ' \"}'
+var start = '{\"text\": \" ';
+var end = ' \"}';
 var message = 'what a time to be alive sad sorrow';
 var data = '';
-var ratingt = '';
+var anger = '';
+var disgust = '';
+
+const MEAN_THRESHOLD = 0.4;
 
 //Gets stuff in message box
-x.innerText;
-
-message = x;
 
 // Get the main tweet button  (there are more than one, but the main one is the first).
 var y = document.getElementsByClassName("btn primary-btn tweet-action tweet-btn js-tweet-btn");
@@ -26,55 +26,83 @@ var y = document.getElementsByClassName("btn primary-btn tweet-action tweet-btn 
 
 y[0].addEventListener("click", function(event){tweetParser(event)}, true);
 
+
+function sleep (time) {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
+
+
 function tweetParser(event){
     console.log('test!');
+    console.log(x.innerText);
+    message = x.innerText;
 
     event.stopPropagation(); // stops the twitter sending the tweet
 
-    // var isMean = true;
+    baseurl = "https://watson-api-explorer.mybluemix.net/tone-analyzer/api/v3/tone?version=2016-05-19&text=";
+    console.log(message.replace(/ /g, "\%20")); 
 
     function yourFunction(callback){
       $.ajax({
-          url: "https://watson-api-explorer.mybluemix.net/tone-analyzer/api/v3/tone?version=2016-05-19&text=",
-          type: 'POST',
+          url: baseurl + message.replace(/ /g, "\%20"),
+          type: 'GET',
           dataType: 'json',
           contentType: 'application/json',
           processData: false,
           data: "" + start + message + end,
           success: function (data) {
-          alert(JSON.stringify(data));
-          //data = JSON.stringify(data.document_tone.tone_categories[0].tones[0].tone_id);
+          console.log(JSON.stringify(data));
           },
           error: function(){
-              alert("Cannot get data");
+              console.log("Cannot get data");
           }
 
           }).done(function(result) {
-              /* do something with the result here */
-              alert("asdfdafasdf" + x);
-              rating = JSON.stringify(result);
-              document.write(rating);
-              callback(result); // invokes the callback function passed as parameter
+              ///* do something with the result here */
+              //rating = JSON.stringify(result);
+              ////document.write(rating);
+              //callback(result); // invokes the callback function passed as parameter
+              console.log('ajax done');
 
+              anger = (JSON.stringify(result.document_tone.tone_categories[0].tones[0].score));
+              disgust = (JSON.stringify(result.document_tone.tone_categories[1].tones[0].score));
+              if(anger > MEAN_THRESHOLD || disgust > MEAN_THRESHOLD){
+                  event.stopPropagation();
+                  if( confirm("We have detected that this may be offensive to others. Do you want to revise your tweet?")){
+                      console.log('mans did the right thing');
+                      sleep(1000);
+                  } else{
+                      console.log('why man');
+                      y[0].click();
+                      // add a sleep so that the code is not executed twice
+                      sleep(1000);
+                  };
+                  
+              } else {
+                  console.log('nice tweet');
+                  y[0].click();
+                  // add a sleep so that the code is not executed twice
+                  sleep(1000);
+              };
         });
     }
 
     yourFunction(function(result) {
         rating = (JSON.stringify(result.document_tone.tone_categories[0].tones[0].score));
+        //alert('poop');
+        //if(rating > ANGRY_THRESHOLD){
+        //    if( confirm("We have detected that this may be offensive to others. Do you want to revise your tweet?")){
+        //        console.log('mans did the right thing');
+        //    } else{
+        //        y[0].click();
+        //    };
+        //    
+        //} else {
+        //    y[0].click();
+        //};
 
-        // if(rating < 0.05){
-        alert("That is offensive");
-        // }
-
+    event.stopPropagation(); // stops the twitter sending the tweet
     });
 
 
-    // do stuff here, like API calls, etc...
-
-    if (isMean){
-        alert('kinda mean fam, sure you wanna tweet that?');
-        // if they want to change...
-        event.stopPropagation(); // stops the twitter sending the tweet
-
-    };
 }
